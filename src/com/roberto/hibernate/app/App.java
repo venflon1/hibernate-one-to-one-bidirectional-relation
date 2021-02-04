@@ -18,26 +18,34 @@ public class App {
 												.buildSessionFactory();
 
 		Session dbSession = sessionFactory.openSession();
-
-		// ================== SELECT RECORD ================
-		Instructor instructor1 = dbSession.get(Instructor.class, 20L);
-		dbSession.close();
-		
-		// BIDIRECTIONAL RELATION  
-		//
-		// [Instructor  -------> DetailInstruct]
-		InstructorDetail detail = instructor1.getInstructorDetail();
-		System.out.println(detail);
-		// [Instructor  <------- DetailInstruct]
-		Instructor instructor = detail.getInstructor();
-		System.out.println(instructor);
-		 
-		dbSession = sessionFactory.openSession();
-		Transaction trx = dbSession.beginTransaction();
-		// NOTE: delete also instructor associated because CascadeType.REMOVE
-		dbSession.delete(detail);
-		trx.commit();
-		dbSession.close();
-		sessionFactory.close();
+		try {
+			// ================== SELECT RECORD ================
+			Instructor instructor1 = dbSession.get(Instructor.class, 20L);
+			
+			// BIDIRECTIONAL RELATION  
+			//
+			// [Instructor  -------> DetailInstruct]
+			InstructorDetail detail = instructor1.getInstructorDetail();
+			System.out.println(detail);
+			// [Instructor  <------- DetailInstruct]
+			Instructor instructor = detail.getInstructor();
+			System.out.println(instructor);
+			
+			dbSession = sessionFactory.openSession();
+			Transaction trx = dbSession.beginTransaction();
+			// NOTE: delete also instructor associated because CascadeType.REMOVE
+			dbSession.delete(detail);
+			trx.commit();
+		}catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(dbSession != null && dbSession.isOpen()) {
+				dbSession.close();
+			}
+			if(sessionFactory != null) {
+				sessionFactory.close(); 
+				
+			}
+		}
 	}
 }
