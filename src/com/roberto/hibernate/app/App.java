@@ -2,6 +2,7 @@ package com.roberto.hibernate.app;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 import com.roberto.hibernate.model.Instructor;
@@ -30,7 +31,13 @@ public class App {
 		// [Instructor  <------- DetailInstruct]
 		Instructor instructor = detail.getInstructor();
 		System.out.println(instructor);
-		
+		 
+		dbSession = sessionFactory.openSession();
+		Transaction trx = dbSession.beginTransaction();
+		// NOTE: delete also instructor associated because CascadeType.REMOVE
+		dbSession.delete(detail);
+		trx.commit();
+		dbSession.close();
 		sessionFactory.close();
 	}
 }
